@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  tornId    String   @unique
+  name      String
+  apiKey    String
+  level     Int      @default(1)
+  faction   String?
+  lastSeen  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tradeOpportunities TradeOpportunity[]
+  attackLogs         AttackLog[]
+  @@index([tornId])
+}
+
+model ItemPriceHistory {
+  id         String   @id @default(cuid())
+  itemId     Int
+  itemName   String
+  price      BigInt
+  quantity   Int      @default(1)
+  marketType String   @default("bazaar")
+  recordedAt DateTime @default(now())
+  @@index([itemId])
+  @@index([recordedAt])
+  @@index([itemId, recordedAt])
+}
+
+model TradeOpportunity {
+  id             String    @id @default(cuid())
+  itemId         Int
+  itemName       String
+  listedPrice    BigInt
+  marketAvgPrice BigInt
+  profitAmount   BigInt
+  profitPercent  Float
+  sellerId       String?
+  sellerName     String?
+  status         String    @default("active")
+  detectedAt     DateTime  @default(now())
+  expiresAt      DateTime?
+  userId         String?
+  user           User?     @relation(fields: [userId], references: [id])
+  @@index([itemId])
+  @@index([status])
+  @@index([profitPercent])
+}
+
+model CachedPlayerData {
+  id             String   @id @default(cuid())
+  tornId         String   @unique
+  name           String
+  level          Int
+  status         String   @default("unknown")
+  lastAction     String?
+  estimatedStr   BigInt?
+  estimatedDef   BigInt?
+  estimatedSpd   BigInt?
+  estimatedDex   BigInt?
+  totalStats     BigInt?
+  faction        String?
+  factionId      Int?
+  winProbability Float    @default(0.5)
+  riskScore      Float    @default(0.5)
+  rewardEstimate BigInt   @default(0)
+  cachedAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  @@index([tornId])
+  @@index([level])
+  @@index([winProbability])
+}
+
+model AttackLog {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  targetId      String
+  targetName    String
+  outcome       String?
+  cashGained    BigInt?
+  respectGained Float?
+  attackedAt    DateTime @default(now())
+  @@index([userId])
+  @@index([attackedAt])
+}
+
+model MarketSnapshot {
+  id         String   @id @default(cuid())
+  snapshotAt DateTime @default(now())
+  itemCount  Int
+  data       Json
+  @@index([snapshotAt])
+}

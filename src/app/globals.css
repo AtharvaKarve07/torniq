@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply border-zinc-700; }
+  body { @apply bg-zinc-950 text-zinc-100; font-family: var(--font-inter), system-ui, sans-serif; }
+  h1,h2,h3,h4,h5,h6 { font-family: var(--font-syne), system-ui, sans-serif; }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { @apply bg-zinc-900; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-zinc-700 rounded-full; }
+  .data-row { @apply border-b border-zinc-800 transition-colors duration-150; }
+  .data-row:hover { @apply bg-zinc-800/40; }
+  .tabular-nums { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+  .pulse-online { animation: pulse-green 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+  @keyframes pulse-green {
+    0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(52,211,153,0.4); }
+    50% { opacity:0.8; box-shadow:0 0 0 4px rgba(52,211,153,0); }
+  }
+  .font-syne { font-family: var(--font-syne), system-ui, sans-serif; }
+}
+
+.recharts-default-tooltip {
+  background: rgb(24,24,27) !important;
+  border: 1px solid rgb(63,63,70) !important;
+  border-radius: 8px !important;
+}
