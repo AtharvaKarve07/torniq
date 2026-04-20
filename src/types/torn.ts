@@ -68,19 +68,59 @@ export interface TornAttackStats {
   moneymugged: number;
 }
 
+// Torn personalstats — all fields available via public API
 export interface TornPersonalStats {
   attackswon: number;
   attackslost: number;
+  attacksdraw: number;
+  bestkillstreak: number;
+  currentkillstreak: number;
   defendswon: number;
-  totalstats: number;
+  defendslost: number;
+  defendsstalemated: number;
+  elo: number;
+  highestbeaten: number;
+  moneymugged: number;
+  retals: number;
+  revives: number;
+  revivesreceived: number;
+  roundsfired: number;
+  timesbeaten: number;
+  unarmoredwon: number;
+  // Economy
   networth: number;
   bazaarprofit: number;
+  bazaarsales: number;
+  bazaarcustomers: number;
+  itemsbought: number;
+  itemssent: number;
+  // Activity
+  useractivity: number;
+  activestreak: number;
+  bestactivestreak: number;
+  // Stats (total battle stats — only available for own profile)
+  totalstats: number;
+  // Drugs / consumables
+  drugsused: number;
+  xantaken: number;
+  cantaken: number;
+  medicalitemsused: number;
+  statenhancersused: number;
+  // Travel
+  timestraveled: number;
+  // Other
+  criminaloffenses: number;
+  lotterywinnings: number;
+  pointsbought: number;
+  pointssold: number;
+  trainsreceived: number;
 }
 
 export interface TornItem {
   name: string;
   description: string;
   type: string;
+  weapon_type: string | null;
   buy_price: number;
   sell_price: number;
   market_value: number;
@@ -153,7 +193,7 @@ export interface DashboardStats {
   nervePercent: number;
   happyPercent: number;
   status: string;
-  faction?: string;
+  faction?: string | null;
   activeOpportunities: number;
   recentProfits: number;
 }
