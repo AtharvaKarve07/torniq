@@ -1,11 +1,12 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useDashboard } from '@/hooks/useQueries';
 import { StatCard } from '@/components/ui/StatCard';
 import { SectionCard, ProgressBar, Badge, Skeleton } from '@/components/ui/index';
 import { formatCash, formatNumber } from '@/lib/analytics';
 import { generateMockPriceHistory } from '@/lib/utils';
-import { Activity, DollarSign, Target, Zap, TrendingUp, Shield } from 'lucide-react';
+import { Activity, DollarSign, Target, Zap, TrendingUp, Shield, ArrowRight } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area,
   XAxis, YAxis, CartesianGrid, Tooltip,
@@ -13,6 +14,7 @@ import {
 import { useMemo } from 'react';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { data: stats, isLoading, error, refetch } = useDashboard();
 
   const networthHistory = useMemo(() => {
@@ -31,7 +33,41 @@ export default function DashboardPage() {
     stats?.status === 'Okay' ? 'online' :
     stats?.status === 'Hospital' ? 'hospital' : 'offline';
 
-  // Show API error with helpful message
+  const QUICK_ACTIONS = [
+    {
+      label: 'Check Signals',
+      description: 'Live market buy/sell signals',
+      icon: TrendingUp,
+      color: 'text-amber-400',
+      bg: 'bg-amber-400/10 border-amber-500/20 hover:bg-amber-400/15 hover:border-amber-500/40',
+      href: '/market',
+    },
+    {
+      label: 'Find Targets',
+      description: 'Attack recommendations',
+      icon: Target,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-400/10 border-emerald-500/20 hover:bg-emerald-400/15 hover:border-emerald-500/40',
+      href: '/attack-finder',
+    },
+    {
+      label: 'Scan Trades',
+      description: 'Underpriced item deals',
+      icon: Zap,
+      color: 'text-blue-400',
+      bg: 'bg-blue-400/10 border-blue-500/20 hover:bg-blue-400/15 hover:border-blue-500/40',
+      href: '/trade-scanner',
+    },
+    {
+      label: 'My Stats',
+      description: 'Profile & analytics',
+      icon: Shield,
+      color: 'text-zinc-300',
+      bg: 'bg-zinc-700/30 border-zinc-700 hover:bg-zinc-700/50 hover:border-zinc-600',
+      href: '/profile',
+    },
+  ];
+
   if (error && !isLoading) {
     return (
       <AppLayout>
@@ -39,7 +75,7 @@ export default function DashboardPage() {
           <div className="p-6 rounded-xl bg-rose-500/10 border border-rose-500/20 max-w-md text-center">
             <p className="text-rose-400 font-syne font-semibold mb-2">Failed to load dashboard</p>
             <p className="text-sm text-zinc-400 mb-4">
-              {error instanceof Error ? error.message : 'Could not connect to Torn API. Check your API key is valid.'}
+              {error instanceof Error ? error.message : 'Could not connect to Torn API.'}
             </p>
             <button
               onClick={() => refetch()}
@@ -95,7 +131,6 @@ export default function DashboardPage() {
             icon={DollarSign}
             color="amber"
             subtitle="Total wealth"
-            trend={{ value: 3.2, label: 'vs last week' }}
           />
           <StatCard
             title="Attacks Won"
@@ -120,7 +155,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Status + chart */}
+        {/* Status bars + chart */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <SectionCard title="Player Status" description="Current resource levels">
             <div className="space-y-5">
@@ -162,7 +197,7 @@ export default function DashboardPage() {
           </SectionCard>
         </div>
 
-        {/* Bottom row */}
+        {/* Attack summary + Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <SectionCard title="Attack Summary">
             <div className="space-y-1">
@@ -181,22 +216,24 @@ export default function DashboardPage() {
             </div>
           </SectionCard>
 
-          <SectionCard title="Quick Actions">
+          {/* Quick Actions — fully clickable buttons using router.push */}
+          <SectionCard title="Quick Actions" description="Jump to any feature">
             <div className="grid grid-cols-2 gap-3">
-              {[
-                { href: '/market', icon: TrendingUp, label: 'Check Signals', color: 'text-amber-400' },
-                { href: '/attack-finder', icon: Target, label: 'Find Targets', color: 'text-emerald-400' },
-                { href: '/trade-scanner', icon: Zap, label: 'Scan Trades', color: 'text-blue-400' },
-                { href: '/profile', icon: Shield, label: 'My Stats', color: 'text-zinc-400' },
-              ].map(({ href, icon: Icon, label, color }) => (
-                <a
+              {QUICK_ACTIONS.map(({ label, description, icon: Icon, color, bg, href }) => (
+                <button
                   key={href}
-                  href={href}
-                  className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 hover:border-zinc-600 transition-all group"
+                  onClick={() => router.push(href)}
+                  className={`flex flex-col items-start gap-3 p-4 rounded-xl border transition-all duration-150 cursor-pointer group text-left ${bg}`}
                 >
-                  <Icon className={`w-5 h-5 ${color} group-hover:scale-110 transition-transform`} />
-                  <span className="text-sm font-medium text-zinc-300">{label}</span>
-                </a>
+                  <div className="flex items-center justify-between w-full">
+                    <Icon className={`w-5 h-5 ${color} group-hover:scale-110 transition-transform duration-150`} />
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 group-hover:translate-x-0.5 transition-all duration-150" />
+                  </div>
+                  <div>
+                    <p className={`text-sm font-syne font-semibold ${color}`}>{label}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{description}</p>
+                  </div>
+                </button>
               ))}
             </div>
           </SectionCard>
